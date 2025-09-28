@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Duel Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            flex-wrap: nowrap;
+            gap: 10px;
+            flex-direction: row;
+        }
+
+        .round-info {
+            width: 50%;
+            font-weight: bold;
+            font-size: 1.1em;
+            
+            h3 {
+                font-size: 1.5em;
+                margin-bottom: 0px;
+            }
+        }
+
+        .energy-label {
+            font-weight: bold;
+            font-size: 1.5em;
+            margin-bottom: 0px;
+        }
+        .energy-counts {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .energy-counts > div {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+}
+        .energy-info {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-direction: column;
+            width: 50%;
+        }
+
+        .energy-meter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .energy-bar {
+            width: 60px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .energy-fill {
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.3s ease;
+        }
+
+        .controls {
+            width: 33%;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+.choices {
+    display: flex;
+    flex-direction: row;
+}
+        .btn-pass {
+            background: #ff9800;
+            color: white;
+            border-radius: 30px;
+            padding: 0px 20px;
+            margin-left: 10px;
+            height: 100%;
+        }
+
+        .btn-pass:hover:not(:disabled) {
+            background: #f57c00;
+        }
+
+        .btn-lock {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-lock:hover:not(:disabled) {
+            background: #45a049;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .round-column {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .round-header {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        .turn-cell {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            padding: 8px;
+            margin-bottom: 8px;
+            min-height: 60px;
+            position: relative;
+        }
+
+        .turn-cell.current {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid #4CAF50;
+        }
+
+        .bot-play,
+        .player-play {
+            font-size: 0.8em;
+            margin: 2px 0;
+        }
+
+        .bot-play {
+            color: #ff9999;
+        }
+
+        .player-play {
+            color: #99ccff;
+        }
+
+        .points-chip {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #4CAF50;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+        .round-subtotal {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        .hand {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .hand-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+.card-pill {
+    padding: 40px 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 93px;
+    font-size: 0.9em;
+}
+
+        .card-pill:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .card-pill.selected {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .card-pill.unaffordable {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .selection-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .log {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 620px;
+            overflow-y: auto;
+        }
+
+        .log-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .log-entry {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .overlay.show {
+            display: flex;
+        }
+
+        .overlay-content {
+            background: white;
+            color: black;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .overlay h2 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        .btn-play-again {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .btn-play-again:hover {
+            background: #45a049;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        span.xtralog {
+            background-color: #ffffffb8;
+            width: 100%;
+            display: inline-block;
+            color: #000;
+            padding: 3px;
+            text-align: center;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div>
+                <div class="top-bar">
+                    <div class="round-info" id="roundInfo"><h3>Round 1 of 4</h3> Turn 1 of 3</div>
+                    <div class="energy-info">
+                        <div class="energy-label">Momentum</div>
+                        <div class="energy-counts">
+                            <div class="energy-meter">
+                                <span>Player: <span id="playerEnergyText">3</span></span>
+                                <div class="energy-bar">
+                                    <div class="energy-fill" id="playerEnergyBar" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="energy-meter">
+                                <span>Bot: <span id="botEnergyText">3</span></span>
+                                <div class="energy-bar">
+                                    <div class="energy-fill" id="botEnergyBar" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="board" id="board"></div>
+                <div class="hand">
+                    <div class="hand-title">Your Moments</div>
+                    <div class="choices">
+                         <div class="cards-container" id="cardsContainer"></div><button class="btn btn-pass card-pill" id="passBtn" onclick="selectPass()">Pass</button>
+                    </div>
+                    <div class="selection-info" id="selectionInfo">Select cards to play or choose Pass, then click "Lock In"</div>
+                    <div class="controls">
+                        <button class="btn btn-lock" id="lockBtn" onclick="lockInPlayer()" disabled>Lock In</button>
+                    </div>
+                </div>
+            </div>
+            <div class="log">
+                <div class="log-title">Commentary</div>
+                <div id="logEntries"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="overlay-content">
+            <h2 id="overlayTitle">Game Over</h2>
+            <p id="overlayMessage"></p>
+            <button class="btn-play-again" onclick="playAgain()">Play Again</button>
+            <button class="btn-play-again" onclick="removeOverlay()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Tiny head-to-head card duel prototype (no backend, no chain).
+
+        const CONST = {
+            ROUNDS: 4,
+            TURNS: 3,
+            START_ENERGY: 3,
+            ENERGY_PER_TURN: 1,
+            PASS_BONUS: 1
+        };
+
+        const PLAYER_DECK = [{
+                id: 'A7',
+                type: 'ATTACK',
+                power: 7,
+                cost: 3
+            },
+            {
+                id: 'A5',
+                type: 'ATTACK',
+                power: 5,
+                cost: 2
+            },
+            {
+                id: 'A3',
+                type: 'ATTACK',
+                power: 3,
+                cost: 1
+            },
+            {
+                id: 'D6',
+                type: 'DEFENSE',
+                power: 6,
+                cost: 3
+            },
+            {
+                id: 'D4',
+                type: 'DEFENSE',
+                power: 4,
+                cost: 2
+            },
+            {
+                id: 'D2',
+                type: 'DEFENSE',
+                power: 2,
+                cost: 1
+            },
+            {
+                id: 'G+3',
+                type: 'GEAR',
+                boost: 3,
+                cost: 1
+            }
+        ];
+
+        const BOT_DECK = [{
+                id: 'A8',
+                type: 'ATTACK',
+                power: 8,
+                cost: 3
+            },
+            {
+                id: 'A4',
+                type: 'ATTACK',
+                power: 4,
+                cost: 2
+            },
+            {
+                id: 'A2',
+                type: 'ATTACK',
+                power: 2,
+                cost: 1
+            },
+            {
+                id: 'D7',
+                type: 'DEFENSE',
+                power: 7,
+                cost: 3
+            },
+            {
+                id: 'D5',
+                type: 'DEFENSE',
+                power: 5,
+                cost: 2
+            },
+            {
+                id: 'D3',
+                type: 'DEFENSE',
+                power: 3,
+                cost: 1
+            },
+            {
+                id: 'G+3b',
+                type: 'GEAR',
+                boost: 3,
+                cost: 1
+            }
+        ];
+
+        let state = {};
+
+        function seededPRNG(seed) {
+            return {
+                seed: seed,
+                next() {
+                    this.seed = (this.seed * 1103515245 + 12345) & 0x7fffffff;
+                    return this.seed / 0x7fffffff;
+                }
+            };
+        }
+
+        function seededShuffle(arr) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(state.rng.next() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function init() {
+            state = {
+                round: 1,
+                turn: 1,
+                energyP: CONST.START_ENERGY,
+                energyB: CONST.START_ENERGY,
+                passLastP: false,
+                passLastB: false,
+                handP: [],
+                handB: [],
+                graveP: [],
+                graveB: [],
+                board: [],
+                roundSubtotal: {
+                    P: 0,
+                    B: 0
+                },
+                roundsWon: {
+                    P: 0,
+                    B: 0
+                },
+                lockedP: null,
+                lockedB: null,
+                lastPlayP: null,
+                lastPlayB: null,
+                rng: seededPRNG(42),
+                selectedCards: [],
+                passSelected: false
+            };
+
+            state.handP = seededShuffle(PLAYER_DECK);
+            state.handB = seededShuffle(BOT_DECK);
+
+            for (let r = 0; r < CONST.ROUNDS; r++) {
+                state.board[r] = [];
+                for (let t = 0; t < CONST.TURNS; t++) {
+                    state.board[r][t] = {
+                        playerPlay: null,
+                        botPlay: null,
+                        playerPoints: 0,
+                        botPoints: 0
+                    };
+                }
+            }
+
+            startMatch();
+        }
+
+        function startMatch() {
+            updateUI();
+            addLog("Match started! First to win 3 rounds wins the game.");
+            startRound(); // ensure Round 1 actually begins
+        }
+
+        function startRound() {
+            state.energyP = CONST.START_ENERGY;
+            state.energyB = CONST.START_ENERGY;
+            state.roundSubtotal = {
+                P: 0,
+                B: 0
+            };
+            state.passLastP = false;
+            state.passLastB = false;
+            state.turn = 1;
+            addLog(`Round ${state.round} started!`);
+            startTurn();
+        }
+
+        function startTurn() {
+            // Energy gain happens only from Turn 2 onward within the SAME round.
+            // Pass bonus does not carry across rounds by design.
+            if (state.turn > 1) {
+                state.energyP += CONST.ENERGY_PER_TURN;
+                state.energyB += CONST.ENERGY_PER_TURN;
+
+                if (state.passLastP) {
+                    state.energyP += CONST.PASS_BONUS;
+                    addLog("You gain +1 energy for passing last turn.");
+                }
+                if (state.passLastB) {
+                    state.energyB += CONST.PASS_BONUS;
+                    addLog("Bot gains +1 energy for passing last turn.");
+                }
+            }
+
+            state.passLastP = false;
+            state.passLastB = false;
+            state.lockedP = null;
+            state.lockedB = null;
+            state.selectedCards = [];
+            state.passSelected = false;
+
+            updateUI();
+        }
+
+        function overBudget(nextIds) {
+            const cards = nextIds.map(id => state.handP.find(c => c.id === id)).filter(Boolean);
+            const totalCost = cards.reduce((s, c) => s + (c?.cost || 0), 0);
+            return totalCost > state.energyP;
+        }
+
+        function selectCard(cardId) {
+            // If Pass was toggled, unselect it when any card is clicked
+            if (state.passSelected) state.passSelected = false;
+
+            const card = state.handP.find(c => c.id === cardId);
+            if (!card) return;
+
+            const isSelected = state.selectedCards.includes(cardId);
+
+            if (isSelected) {
+                state.selectedCards = state.selectedCards.filter(id => id !== cardId);
+            } else {
+                if (card.type === 'ATTACK') {
+                    // Keep only an existing GEAR (if any), then add this ATTACK
+                    let next = state.selectedCards
+                        .filter(id => {
+                            const c = state.handP.find(x => x.id === id);
+                            return c && c.type === 'GEAR';
+                        });
+                    next.push(cardId);
+                    if (overBudget(next)) return; // block unaffordable combo
+                    state.selectedCards = next;
+                } else if (card.type === 'DEFENSE') {
+                    const next = [cardId];
+                    if (overBudget(next)) return;
+                    state.selectedCards = next;
+                } else if (card.type === 'GEAR') {
+                    const hasAttack = state.selectedCards.some(id => {
+                        const c = state.handP.find(x => x.id === id);
+                        return c && c.type === 'ATTACK';
+                    });
+                    if (hasAttack) {
+                        let next = state.selectedCards.filter(id => {
+                            const c = state.handP.find(x => x.id === id);
+                            return c && c.type !== 'GEAR';
+                        });
+                        next.push(cardId);
+                        if (overBudget(next)) return;
+                        state.selectedCards = next;
+                    }
+                }
+            }
+
+            updateUI();
+        }
+
+        function selectPass() {
+            state.passSelected = !state.passSelected;
+            if (state.passSelected) {
+                state.selectedCards = [];
+            }
+            updateUI();
+        }
+
+        function isValidSelection() {
+            if (state.passSelected) return true;
+            if (state.selectedCards.length === 0) return false;
+
+            const cards = state.selectedCards.map(id => state.handP.find(c => c.id === id)).filter(card => card !== undefined);
+            if (cards.length !== state.selectedCards.length) return false; // card missing
+
+            const totalCost = cards.reduce((sum, card) => sum + card.cost, 0);
+            if (totalCost > state.energyP) return false;
+
+            const attackCount = cards.filter(c => c.type === 'ATTACK').length;
+            const defenseCount = cards.filter(c => c.type === 'DEFENSE').length;
+            const gearCount = cards.filter(c => c.type === 'GEAR').length;
+
+            if (defenseCount > 0 && (attackCount > 0 || gearCount > 0)) return false;
+            if (defenseCount > 1) return false;
+            if (attackCount > 1) return false;
+            if (gearCount > 1) return false;
+            if (gearCount > 0 && attackCount === 0) return false;
+
+            return true;
+        }
+
+        function lockInPlayer() {
+            if (!isValidSelection()) return;
+
+            if (state.passSelected) {
+                state.lockedP = {
+                    play: 'PASS'
+                };
+                state.passLastP = true;
+            } else {
+                const cards = state.selectedCards.map(id => state.handP.find(c => c.id === id)).filter(Boolean);
+                const attackCard = cards.find(c => c.type === 'ATTACK');
+                const defenseCard = cards.find(c => c.type === 'DEFENSE');
+                const gearCard = cards.find(c => c.type === 'GEAR');
+
+                state.lockedP = {
+                    play: attackCard ? 'ATTACK' : 'DEFENSE',
+                    attackCard,
+                    defenseCard,
+                    gearCard
+                };
+
+                const totalCost = cards.reduce((sum, card) => sum + card.cost, 0);
+                state.energyP -= totalCost;
+
+                // Move played cards from hand to grave
+                cards.forEach(card => {
+                    const idx = state.handP.findIndex(c => c.id === card.id);
+                    if (idx !== -1) {
+                        state.handP.splice(idx, 1);
+                        state.graveP.push(card);
+                    }
+                });
+            }
+
+            botChoose();
+            revealAndScore();
+        }
+
+        function botChoose() {
+            let play = null;
+
+            const affordable = state.handB.filter(card => card.cost <= state.energyB);
+
+            // If player attacked last turn and bot can afford a defense >= that attack, defend
+            if (state.lastPlayP && state.lastPlayP.play === 'ATTACK') {
+                const playerAttack = state.lastPlayP.attackCard.power + (state.lastPlayP.gearCard ? state.lastPlayP.gearCard.boost : 0);
+                const goodDefs = affordable.filter(c => c.type === 'DEFENSE' && c.power >= playerAttack);
+                if (goodDefs.length > 0) {
+                    const bestDefense = goodDefs.reduce((best, c) => (c.power > best.power ? c : best), goodDefs[0]);
+                    play = {
+                        play: 'DEFENSE',
+                        defenseCard: bestDefense
+                    };
+                    state.energyB -= bestDefense.cost;
+                    const idx = state.handB.findIndex(c => c.id === bestDefense.id);
+                    state.handB.splice(idx, 1);
+                    state.graveB.push(bestDefense);
+                }
+            }
+
+            if (!play) {
+                const attacks = affordable.filter(c => c.type === 'ATTACK');
+                if (attacks.length > 0) {
+                    const bestAttack = attacks.reduce((best, c) => (c.power > best.power ? c : best), attacks[0]);
+                    const gears = affordable.filter(c => c.type === 'GEAR' && c.cost + bestAttack.cost <= state.energyB);
+
+                    let gearCard = null;
+                    if (gears.length > 0 && state.rng.next() < 0.2) {
+                        // Choose the highest boost gear (deterministic tie-breaker by order)
+                        gearCard = gears.reduce((best, c) => (c.boost > best.boost ? c : best), gears[0]);
+                    }
+
+                    play = {
+                        play: 'ATTACK',
+                        attackCard: bestAttack,
+                        gearCard
+                    };
+
+                    state.energyB -= bestAttack.cost;
+                    let idx = state.handB.findIndex(c => c.id === bestAttack.id);
+                    state.handB.splice(idx, 1);
+                    state.graveB.push(bestAttack);
+
+                    if (gearCard) {
+                        state.energyB -= gearCard.cost;
+                        idx = state.handB.findIndex(c => c.id === gearCard.id);
+                        state.handB.splice(idx, 1);
+                        state.graveB.push(gearCard);
+                    }
+                }
+            }
+
+            if (!play) {
+                play = {
+                    play: 'PASS'
+                };
+                state.passLastB = true;
+            }
+
+            state.lockedB = play;
+        }
+
+        function revealAndScore() {
+            const turnData = state.board[state.round - 1][state.turn - 1];
+
+            turnData.playerPlay = state.lockedP;
+            turnData.botPlay = state.lockedB;
+
+            let playerAttack = 0,
+                playerDefense = 0,
+                botAttack = 0,
+                botDefense = 0;
+
+            if (state.lockedP.play === 'ATTACK' && state.lockedP.attackCard) {
+                playerAttack = state.lockedP.attackCard.power + (state.lockedP.gearCard ? state.lockedP.gearCard.boost : 0);
+            } else if (state.lockedP.play === 'DEFENSE' && state.lockedP.defenseCard) {
+                playerDefense = state.lockedP.defenseCard.power;
+            }
+
+            if (state.lockedB.play === 'ATTACK' && state.lockedB.attackCard) {
+                botAttack = state.lockedB.attackCard.power + (state.lockedB.gearCard ? state.lockedB.gearCard.boost : 0);
+            } else if (state.lockedB.play === 'DEFENSE' && state.lockedB.defenseCard) {
+                botDefense = state.lockedB.defenseCard.power;
+            }
+
+            const playerPoints = Math.max(0, playerAttack - botDefense);
+            const botPoints = Math.max(0, botAttack - playerDefense);
+
+            turnData.playerPoints = playerPoints;
+            turnData.botPoints = botPoints;
+
+            state.roundSubtotal.P += playerPoints;
+            state.roundSubtotal.B += botPoints;
+
+            addLog(`You: ${formatPlay(state.lockedP)} | Bot: ${formatPlay(state.lockedB)} → You +${playerPoints} pts, Bot +${botPoints} pts`);
+
+            state.lastPlayP = state.lockedP;
+            state.lastPlayB = state.lockedB;
+
+            setTimeout(() => {
+                updateUI();
+                endTurn();
+            }, 300);
+        }
+
+        function formatPlay(play) {
+            if (play.play === 'PASS') return 'PASS';
+            let str = '';
+            if (play.attackCard) {
+                str += `ATTACK ${play.attackCard.power}`;
+                if (play.gearCard) str += ` + GEAR +${play.gearCard.boost}`;
+                str += ` (cost ${play.attackCard.cost + (play.gearCard ? play.gearCard.cost : 0)})`;
+            } else if (play.defenseCard) {
+                str += `DEFENSE ${play.defenseCard.power} (cost ${play.defenseCard.cost})`;
+            }
+            return str;
+        }
+
+        function endTurn() {
+            state.turn++;
+            if (state.turn > CONST.TURNS) {
+                endRound();
+            } else {
+                startTurn();
+            }
+        }
+
+        function endRound() {
+            const playerTotal = state.roundSubtotal.P;
+            const botTotal = state.roundSubtotal.B;
+
+            let winner = '';
+            if (playerTotal > botTotal) {
+                state.roundsWon.P++;
+                winner = 'Player';
+            } else if (botTotal > playerTotal) {
+                state.roundsWon.B++;
+                winner = 'Bot';
+            } else {
+                winner = 'Tie';
+            }
+
+            const label = (winner === 'Tie') ? 'Tie' : `${winner} wins!`;
+            addLog(`Round ${state.round} complete: You ${playerTotal} pts, Bot ${botTotal} pts — ${label}`);
+
+            if (state.roundsWon.P >= 3 || state.roundsWon.B >= 3) {
+                const matchWinner = state.roundsWon.P >= 3 ? 'Player' : 'Bot';
+                endMatch(matchWinner);
+                return;
+            }
+
+            state.round++;
+            if (state.round > CONST.ROUNDS) {
+                if (state.roundsWon.P === state.roundsWon.B) {
+                    tieBreakerIfNeeded();
+                } else {
+                    const matchWinner = state.roundsWon.P > state.roundsWon.B ? 'Player' : 'Bot';
+                    endMatch(matchWinner);
+                }
+            } else {
+                startRound();
+            }
+        }
+
+        function top3AttackSum(cards) {
+            return cards
+                .filter(c => c.type === 'ATTACK')
+                .sort((a, b) => b.power - a.power)
+                .slice(0, 3)
+                .reduce((s, c) => s + c.power, 0);
+        }
+
+        function tieBreakerIfNeeded() {
+            const playerSum = top3AttackSum(state.handP);
+            const botSum = top3AttackSum(state.handB);
+
+            addLog(`Tie-breaker: Your top-3 ATTACK sum = ${playerSum}, Bot = ${botSum}`);
+
+            if (playerSum > botSum) {
+                endMatch('Player');
+            } else if (botSum > playerSum) {
+                endMatch('Bot');
+            } else {
+                addLog(`Still tied! Energy check — You ${state.energyP} vs Bot ${state.energyB}`);
+                if (state.energyP > state.energyB) {
+                    addLog('Higher remaining energy — You win the tie-break.');
+                    endMatch('Player');
+                } else if (state.energyB > state.energyP) {
+                    addLog('Higher remaining energy — Bot wins the tie-break.');
+                    endMatch('Bot');
+                } else {
+                    addLog('Still tied! Coin flip...');
+                    const coinWinner = state.rng.next() < 0.5 ? 'Player' : 'Bot';
+                    addLog(`Coin flip result: ${coinWinner} wins!`);
+                    endMatch(coinWinner);
+                }
+            }
+        }
+
+        function endMatch(winner) {
+            document.getElementById('overlayTitle').textContent = 'Match Complete!';
+            document.getElementById('overlayMessage').textContent = `${winner} wins the match!`;
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function playAgain() {
+            document.getElementById('overlay').classList.remove('show');
+            init();
+        }
+
+        function removeOverlay() {
+            document.getElementById('overlay').classList.remove('show');
+            document.querySelector('.controls').appendChild('<button class="btn btn-lock" onclick="init()">Play Again</button>')
+        }
+
+        function updateUI() {
+            document.getElementById('roundInfo').innerHTML = `<h3>Round ${state.round} of ${CONST.ROUNDS}</h3>  Turn ${state.turn} of ${CONST.TURNS}`;
+
+            const peBar = document.getElementById('playerEnergyBar');
+            const beBar = document.getElementById('botEnergyBar');
+
+            document.getElementById('playerEnergyText').textContent = state.energyP;
+            document.getElementById('botEnergyText').textContent = state.energyB;
+
+            peBar.style.width = `${Math.min(100, state.energyP * 10)}%`;
+            peBar.title = `${state.energyP} energy`;
+            beBar.style.width = `${Math.min(100, state.energyB * 10)}%`;
+            beBar.title = `${state.energyB} energy`;
+
+            updateBoard();
+            updateHand();
+            updateControls();
+        }
+
+        function updateBoard() {
+            const boardEl = document.getElementById('board');
+            boardEl.innerHTML = '';
+
+            for (let r = 0; r < CONST.ROUNDS; r++) {
+                const roundEl = document.createElement('div');
+                roundEl.className = 'round-column';
+
+                const headerEl = document.createElement('div');
+                headerEl.className = 'round-header';
+                headerEl.textContent = `Round ${r + 1}`;
+
+                // Show winner only if the round is completed (all 3 turns resolved)
+                const completed = (r < state.round - 1) || (r === state.round - 1 && state.turn > CONST.TURNS);
+                if (completed) {
+                    const pTotal = state.board[r].reduce((s, t) => s + t.playerPoints, 0);
+                    const bTotal = state.board[r].reduce((s, t) => s + t.botPoints, 0);
+                    if (pTotal > bTotal) headerEl.textContent += " (You)";
+                    else if (bTotal > pTotal) headerEl.textContent += " (Bot)";
+                    else headerEl.textContent += " (Tie)";
+                }
+                roundEl.appendChild(headerEl);
+
+                for (let t = 0; t < CONST.TURNS; t++) {
+                    const turnEl = document.createElement('div');
+                    turnEl.className = 'turn-cell';
+                    if (r === state.round - 1 && t === state.turn - 1) turnEl.classList.add('current');
+
+                    const turnData = state.board[r][t];
+
+                    if (turnData.botPlay) {
+                        const botPlayEl = document.createElement('div');
+                        botPlayEl.className = 'bot-play';
+                        botPlayEl.textContent = formatPlayShort(turnData.botPlay);
+                        turnEl.appendChild(botPlayEl);
+                    }
+
+                    if (turnData.playerPlay) {
+                        const playerPlayEl = document.createElement('div');
+                        playerPlayEl.className = 'player-play';
+                        playerPlayEl.textContent = formatPlayShort(turnData.playerPlay);
+                        turnEl.appendChild(playerPlayEl);
+                    }
+
+                    if (turnData.playerPoints > 0 || turnData.botPoints > 0) {
+                        const pointsEl = document.createElement('div');
+                        pointsEl.className = 'points-chip fade-in';
+                        pointsEl.textContent = `You +${turnData.playerPoints} | Bot +${turnData.botPoints}`;
+                        turnEl.appendChild(pointsEl);
+                    }
+
+                    roundEl.appendChild(turnEl);
+                }
+
+                // Subtotals
+                if (r < state.round || (r === state.round - 1 && state.turn > CONST.TURNS)) {
+                    const subtotalEl = document.createElement('div');
+                    subtotalEl.className = 'round-subtotal';
+                    const pTotal = state.board[r].reduce((sum, turn) => sum + turn.playerPoints, 0);
+                    const bTotal = state.board[r].reduce((sum, turn) => sum + turn.botPoints, 0);
+                    subtotalEl.textContent = `You: ${pTotal} | Bot: ${bTotal}`;
+                    roundEl.appendChild(subtotalEl);
+                } else if (r === state.round - 1) {
+                    const subtotalEl = document.createElement('div');
+                    subtotalEl.className = 'round-subtotal';
+                    subtotalEl.textContent = `You: ${state.roundSubtotal.P} | Bot: ${state.roundSubtotal.B}`;
+                    roundEl.appendChild(subtotalEl);
+                }
+
+                boardEl.appendChild(roundEl);
+            }
+        }
+
+        function formatPlayShort(play) {
+            if (play.play === 'PASS') return 'PASS';
+            if (play.attackCard) {
+                let str = `A${play.attackCard.power}`;
+                if (play.gearCard) str += `+G${play.gearCard.boost}`;
+                return str;
+            } else if (play.defenseCard) {
+                return `D${play.defenseCard.power}`;
+            }
+            return '';
+        }
+
+        function updateHand() {
+            const containerEl = document.getElementById('cardsContainer');
+            containerEl.innerHTML = '';
+
+            state.handP.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card-pill';
+
+                if (state.selectedCards.includes(card.id)) {
+                    cardEl.classList.add('selected');
+                }
+                if (card.cost > state.energyP) {
+                    cardEl.classList.add('unaffordable');
+                }
+
+                let text = '';
+                if (card.type === 'ATTACK') text = `ATTACK-${card.power} <br>(${card.cost}Mom)`;
+                else if (card.type === 'DEFENSE') text = `DEFENSE-${card.power} <br>(${card.cost}Mom)`;
+                else if (card.type === 'GEAR') text = `GEAR+${card.boost} <br>(${card.cost}Mom)`;
+
+                cardEl.innerHTML = text;
+                cardEl.onclick = () => selectCard(card.id);
+                containerEl.appendChild(cardEl);
+            });
+
+            const selectionEl = document.getElementById('selectionInfo');
+            if (state.passSelected) {
+                selectionEl.textContent = 'Pass selected — you will gain +1 energy next turn.';
+            } else if (state.selectedCards.length === 0) {
+                selectionEl.textContent = 'Select cards to play or choose Pass.';
+            } else {
+                const cards = state.selectedCards.map(id => state.handP.find(c => c.id === id)).filter(Boolean);
+                const totalCost = cards.reduce((sum, card) => sum + card.cost, 0);
+                const names = cards.map(card => {
+                    if (card.type === 'ATTACK') return `AT-${card.power}`;
+                    if (card.type === 'DEFENSE') return `DEF-${card.power}`;
+                    if (card.type === 'GEAR') return `GEAR+${card.boost}`;
+                }).join(' + ');
+                selectionEl.textContent = `Selected: ${names} (Cost: ${totalCost}-M)`;
+            }
+        }
+
+        function updateControls() {
+            const passBtn = document.getElementById('passBtn');
+            const lockBtn = document.getElementById('lockBtn');
+            passBtn.style.background = state.passSelected ? '#f57c00' : '#ff9800';
+            lockBtn.disabled = !isValidSelection();
+        }
+
+        function addLog(message) {
+            const logEl = document.getElementById('logEntries');
+            const entryEl = document.createElement('div');
+            entryEl.className = 'log-entry fade-in';
+            if (message.split('').includes('|')) {
+                const splitmsgd = message.split(' → ')
+                const cleanedMsg = splitmsgd[0].replaceAll(' | ', '<br>')+'<br><span class="xtralog">'+splitmsgd[1]+'</span>'
+                entryEl.innerHTML = cleanedMsg;
+            } else {
+                entryEl.innerHTML = message;
+            }
+            logEl.appendChild(entryEl);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // Initialize the game when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+</body>
+
+</html>
