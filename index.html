@@ -42,7 +42,7 @@
             width: 50%;
             font-weight: bold;
             font-size: 1.1em;
-            
+
             h3 {
                 font-size: 1.5em;
                 margin-bottom: 0px;
@@ -54,17 +54,19 @@
             font-size: 1.5em;
             margin-bottom: 0px;
         }
+
         .energy-counts {
             display: flex;
             align-items: center;
             width: 100%;
         }
 
-        .energy-counts > div {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-}
+        .energy-counts>div {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+        }
+
         .energy-info {
             display: flex;
             gap: 10px;
@@ -112,10 +114,12 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-.choices {
-    display: flex;
-    flex-direction: row;
-}
+
+        .choices {
+            display: flex;
+            flex-direction: row;
+        }
+
         .btn-pass {
             background: #ff9800;
             color: white;
@@ -239,15 +243,15 @@
             margin-bottom: 15px;
         }
 
-.card-pill {
-    padding: 40px 10px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 93px;
-    font-size: 0.9em;
-}
+        .card-pill {
+            padding: 40px 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 93px;
+            font-size: 0.9em;
+        }
 
         .card-pill:hover {
             background: rgba(255, 255, 255, 0.3);
@@ -341,6 +345,7 @@
         .fade-in {
             animation: fadeIn 0.3s ease-in;
         }
+
         span.xtralog {
             background-color: #ffffffb8;
             width: 100%;
@@ -349,6 +354,7 @@
             padding: 3px;
             text-align: center;
         }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -366,7 +372,9 @@
         <div class="main-content">
             <div>
                 <div class="top-bar">
-                    <div class="round-info" id="roundInfo"><h3>Round 1 of 4</h3> Turn 1 of 3</div>
+                    <div class="round-info" id="roundInfo">
+                        <h3>Round 1 of 4</h3> Turn 1 of 3
+                    </div>
                     <div class="energy-info">
                         <div class="energy-label">Momentum</div>
                         <div class="energy-counts">
@@ -389,9 +397,11 @@
                 <div class="hand">
                     <div class="hand-title">Your Moments</div>
                     <div class="choices">
-                         <div class="cards-container" id="cardsContainer"></div><button class="btn btn-pass card-pill" id="passBtn" onclick="selectPass()">Pass</button>
+                        <div class="cards-container" id="cardsContainer"></div><button class="btn btn-pass card-pill"
+                            id="passBtn" onclick="selectPass()">Pass</button>
                     </div>
-                    <div class="selection-info" id="selectionInfo">Select cards to play or choose Pass, then click "Lock In"</div>
+                    <div class="selection-info" id="selectionInfo">Select cards to play or choose Pass, then click "Lock
+                        In"</div>
                     <div class="controls">
                         <button class="btn btn-lock" id="lockBtn" onclick="lockInPlayer()" disabled>Lock In</button>
                     </div>
@@ -425,91 +435,91 @@
         };
 
         const PLAYER_DECK = [{
-                id: 'A7',
-                type: 'ATTACK',
-                power: 7,
-                cost: 3
-            },
-            {
-                id: 'A5',
-                type: 'ATTACK',
-                power: 5,
-                cost: 2
-            },
-            {
-                id: 'A3',
-                type: 'ATTACK',
-                power: 3,
-                cost: 1
-            },
-            {
-                id: 'D6',
-                type: 'DEFENSE',
-                power: 6,
-                cost: 3
-            },
-            {
-                id: 'D4',
-                type: 'DEFENSE',
-                power: 4,
-                cost: 2
-            },
-            {
-                id: 'D2',
-                type: 'DEFENSE',
-                power: 2,
-                cost: 1
-            },
-            {
-                id: 'G+3',
-                type: 'GEAR',
-                boost: 3,
-                cost: 1
-            }
+            id: 'A7',
+            type: 'ATTACK',
+            power: 7,
+            cost: 3
+        },
+        {
+            id: 'A5',
+            type: 'ATTACK',
+            power: 5,
+            cost: 2
+        },
+        {
+            id: 'A3',
+            type: 'ATTACK',
+            power: 3,
+            cost: 1
+        },
+        {
+            id: 'D6',
+            type: 'DEFENSE',
+            power: 6,
+            cost: 3
+        },
+        {
+            id: 'D4',
+            type: 'DEFENSE',
+            power: 4,
+            cost: 2
+        },
+        {
+            id: 'D2',
+            type: 'DEFENSE',
+            power: 2,
+            cost: 1
+        },
+        {
+            id: 'G+3',
+            type: 'GEAR',
+            boost: 3,
+            cost: 1
+        }
         ];
 
         const BOT_DECK = [{
-                id: 'A8',
-                type: 'ATTACK',
-                power: 8,
-                cost: 3
-            },
-            {
-                id: 'A4',
-                type: 'ATTACK',
-                power: 4,
-                cost: 2
-            },
-            {
-                id: 'A2',
-                type: 'ATTACK',
-                power: 2,
-                cost: 1
-            },
-            {
-                id: 'D7',
-                type: 'DEFENSE',
-                power: 7,
-                cost: 3
-            },
-            {
-                id: 'D5',
-                type: 'DEFENSE',
-                power: 5,
-                cost: 2
-            },
-            {
-                id: 'D3',
-                type: 'DEFENSE',
-                power: 3,
-                cost: 1
-            },
-            {
-                id: 'G+3b',
-                type: 'GEAR',
-                boost: 3,
-                cost: 1
-            }
+            id: 'A8',
+            type: 'ATTACK',
+            power: 8,
+            cost: 3
+        },
+        {
+            id: 'A4',
+            type: 'ATTACK',
+            power: 4,
+            cost: 2
+        },
+        {
+            id: 'A2',
+            type: 'ATTACK',
+            power: 2,
+            cost: 1
+        },
+        {
+            id: 'D7',
+            type: 'DEFENSE',
+            power: 7,
+            cost: 3
+        },
+        {
+            id: 'D5',
+            type: 'DEFENSE',
+            power: 5,
+            cost: 2
+        },
+        {
+            id: 'D3',
+            type: 'DEFENSE',
+            power: 3,
+            cost: 1
+        },
+        {
+            id: 'G+3b',
+            type: 'GEAR',
+            boost: 3,
+            cost: 1
+        }
         ];
 
         let state = {};
@@ -963,7 +973,11 @@
 
         function removeOverlay() {
             document.getElementById('overlay').classList.remove('show');
-            document.querySelector('.controls').appendChild('<button class="btn btn-lock" onclick="init()">Play Again</button>')
+            const pAgain = document.createElement('button');
+            pAgain.setAttribute('onclick', 'window.location.reload()');
+            pAgain.classList.add('btn', 'btn-lock');
+            pAgain.textContent = 'Play Again';
+            document.querySelector('.controls').appendChild(pAgain)
         }
 
         function updateUI() {
@@ -1125,7 +1139,7 @@
             entryEl.className = 'log-entry fade-in';
             if (message.split('').includes('|')) {
                 const splitmsgd = message.split(' → ')
-                const cleanedMsg = splitmsgd[0].replaceAll(' | ', '<br>')+'<br><span class="xtralog">'+splitmsgd[1]+'</span>'
+                const cleanedMsg = splitmsgd[0].replaceAll(' | ', '<br>') + '<br><span class="xtralog">' + splitmsgd[1] + '</span>'
                 entryEl.innerHTML = cleanedMsg;
             } else {
                 entryEl.innerHTML = message;
